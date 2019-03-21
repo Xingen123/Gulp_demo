@@ -1,0 +1,116 @@
+@charset "utf-8";
+
+	// Scss Hack
+	$IE: 10;
+
+	// Base
+	$font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", Helvetica, sans-serif !default;
+
+	// Default colors
+	$color-text-base		: #333;		// 基本
+	$color-text-base-inverse: #fff;		// 基本 - 反色
+	$color-text-secondary	: #696969;	// 辅助色
+	$color-text-tertiary	: #999;		// 辅助色 - 次级
+	$color-text-placeholder	: #C8C8C8;	// 文本框提示
+	
+	// Brand colors
+	$brand-primary			: #978d6c;	// 主色系
+	$brand-primary-enhance	: #776D4D;	// 增强色
+	$brand-error			: #fe5757;	// 错误
+	$brand-success			: #45A4F4;	// 成功
+	$brand-warning			: #F7C24F;	// 警告
+	$brand-cannel			: #F0F0F0;	// 取消
+
+	// Background colors
+	$fill-body				: #f2f2f2;
+
+	// Border colors
+	$border-color-base		: #E8E8E8;
+	
+	// Button colors
+	$button-primary			: #B3A888;
+	$button-secondary		: #F6ECCD;
+
+	// z-index list
+	$zindex-affix			: 10;
+	$zindex-back-top		: 10;
+	$zindex-menu			: 900;
+	$zindex-modal			: 1000;
+	$zindex-drawer          : 1000;
+	$zindex-notification	: 1010;
+	$zindex-message			: 1010;
+	$zindex-popover         : 1020;
+	$zindex-loading     	: 2000;
+
+// Scss Mixin
+	// 文本溢出省略
+	@mixin ellipsis{
+		white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+	}
+	// CSS 边框
+	@mixin border($direction, $color:$border-color-base, $size:.5){
+		@if $direction == top {
+			border-top: $size+px solid $color;
+		} @else if $direction == right {
+			border-right: $size+px solid $color;
+		} @else if $direction == bottom {
+			border-bottom: $size+px solid $color;
+		} @else if $direction == left {
+			border-left: $size+px solid $color;
+		} @else if $direction == all {
+			border: $size+px solid $color;
+		} @else {
+			border: none;
+		}
+	}
+	// This mixin can be written like so to work both nested and unnested.
+	@mixin optional-at-root($sel) {
+		@at-root #{if(not &, $sel, selector-append(&, $sel))} {
+			@content;
+		}
+	}
+	// Placeholder
+	@mixin placeholder {
+		@include optional-at-root('::-webkit-input-placeholder') {
+			@content;
+		}
+		@include optional-at-root(':-moz-placeholder') {
+			@content;
+		}
+		@include optional-at-root('::-moz-placeholder') {
+			@content;
+		}
+		@include optional-at-root(':-ms-input-placeholder') {
+			@content;
+		}
+	}
+	// Flexbox Containers（Flex容器）
+	@mixin flex-box{
+		display: flex;
+	}
+	// Flexbox Flex（分配空间）
+	@mixin flex-col{
+		flex: 1;
+	}
+	// Flexbox Grow（伸缩性）
+	@mixin flex-grow{
+		flex-grow: 1;
+	}
+	// Flexbox Justify Content（主轴对齐方式）
+	// 左对齐（默认）	| 右对齐 	| 居中对齐 	| 两端对齐 			| 平均分布
+	// flex-start 		| flex-end 	| center 	| space-between 	| space-around
+	@mixin justify-content($value: flex-start) {
+		justify-content: $value;
+	}
+	// Flexbox Align Items（交叉轴对齐方式）
+	// 顶部对齐（默认）	| 底部对齐 	| 居中对齐 	| 上下对齐并铺满 	| 文本基线对齐
+	// flex-start 		| flex-end 	| center 	| baseline 			| stretch
+	@mixin align-items($value: stretch) {
+		align-items: $value;
+	}
+	// Flexbox Direction（主轴方向）
+	// 左到右（默认）	| 右到左 		| 上到下 	| 下到上
+	// row 				| row-reverse 	| column 	| column-reverse;
+	@mixin flex-direction($value: row) {
+		flex-direction: $value;
+	}

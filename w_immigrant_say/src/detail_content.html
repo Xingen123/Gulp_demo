@@ -1,0 +1,48 @@
+@@include('@@webRoot/m_doctype.html')
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app"  v-cloak>
+        <div class="content_detail" style="background:white;">
+            <h2>{{contentText.name}}</h2>
+            <div style="color:gray;">{{contentText.author}} <span style="margin-left:15px;">{{contentText.created_at}}</span></div>
+            <img :src="contentText.cover" alt="">
+            <div class="body_text" v-html="contentText.body">{{contentText.body}}</div>
+        </div>
+    </div>
+
+    @@include('@@webRoot/m_script.html')
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    contentText: {}
+                }
+            },
+            mounted() {
+                this.content()
+            },
+            methods: {
+                content() {
+                    service.post(api.articles_detail, {
+                            token: api.api_token,
+                            article_id: localStorage.getItem('articleId')
+                        })
+                        .then((sea) => {
+                            console.log(sea)
+                            this.contentText = sea.data.articles
+                        })
+                        .catch((error) => {
+                            console.log(`222：` + error)
+                            this.$toast(error)
+                        });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <notice-bar title="您可将最新的活动信息转发给您的朋友，邀请朋友参与活动将有额外惊喜奖励。 "></notice-bar>
+
+        <div class="activity-intro">
+            <img class="activity-intro__cover" :src="activity_detail.large_cover">
+            <div class="activity-intro__content">
+                <h1 class="activity-intro__title">{{activity_detail.name}}</h1>
+                <div class="activity-intro__desc" v-html="activity_detail.content">
+                    {{activity_detail.content}}
+                </div>
+            </div>
+        </div>
+        <div class="m-panel">
+            <div class="m-panel__hd"><i class="ui-icon ui-icon-calendar"></i>活动场次</div>
+            <div class="m-panel__bd">
+                <div class="activity-schedule activity-schedule_action" v-for="item in active_field">
+                    <div class="activity-schedule__city">{{item.citys}}</div>
+                    <ul class="activity-schedule__items">
+                        <li class="activity-schedule__item" v-for="subitem in item.info">
+                            <label class="activity-schedule__radio">
+                                <input class="activity-schedule__input" type="radio" name="field" @change="pickedData = subitem">
+                                <span class="activity-schedule__inner"></span>
+                                <p class="activity-schedule__cell">
+                                    <i class="ui-icon ui-icon_sm ui-icon-local"></i>{{subitem.address}}
+                                </p>
+                                <p class="activity-schedule__cell">
+                                    <i class="ui-icon ui-icon_sm ui-icon-time"></i>{{subitem.time}}
+                                </p>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <button class="ui-btn ui-btn_primary" @click="openAction">马上报名</button>
+            </div>
+        </div>
+
+        <loadmore></loadmore>
+
+        <actionsheet ref="toastChild" :title="'活动预约'">
+            <div class="activity-info">
+                <div class="activity-info__hd">活动场次</div>
+                <div class="activity-info__bd">
+                    <p>{{pickedData.address}}</p>
+                    <p>{{pickedData.time}}</p>
+                </div>
+            </div>
+            <form class="m-form" @submit.prevent="formSubmit">
+                <div class="m-form-item">
+                    <div class="m-form-item__content">
+                        <input class="ui-input m-form__input" type="text" v-model.trim="formData.name" placeholder="请输入申请人姓名" @blur="resetScrollbar()">
+                    </div>
+                </div>
+                <div class="m-form-item">
+                    <div class="m-form-item__content">
+                        <input class="ui-input m-form__input" type="text" v-model.trim="formData.mobile" placeholder="请输入手机号" @blur="resetScrollbar()">
+                    </div>
+                </div>
+                <div class="m-form-item">
+                    <div class="m-form-item__content">
+                        <input class="ui-input m-form__input" type="text" v-model.trim="formData.mobile_code" placeholder="请输入验证码" @blur="resetScrollbar()">
+                        <button class="ui-btn m-form__code" type="button" @click="getCaptcha(1)" :disabled="captcha.state">{{captcha.text}}</button>
+                    </div>
+                </div>
+                <div class="m-form-action">
+                    <button class="ui-btn ui-btn_primary ui-btn_sm">
+                        <i class="ui-icon ui-icon-enroll"></i>
+                        <span>报名</span>
+                    </button>
+                </div>
+            </form>
+        </actionsheet>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    activity_detail: [],
+                    active_field: [],
+                    pickedData: {},
+                    formData: {
+                        active_field: '',
+                        name: '',
+                        mobile: '',
+                        mobile_code: '',
+                        activity_name: ''
+                    },
+                    captcha: {
+                        code: '',
+                        time: 60,
+                        state: false,
+                        text: '获取验证码',
+                    },
+                }
+            },
+            mounted() {
+                let paramsId = this.getQueryString('id')
+                if (paramsId) {
+                    this.postActivityDetail(paramsId)
+                } else {
+                    window.location.href = '404.html';
+                }
+            },
+            methods: {
+                // 获取微信code
+                getQueryString(param) {
+                    let reg = new RegExp("(^|&)" + param + "=([^&]*)(&|$)", "i");
+                    let r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                },
+                // 发送验证
+                getCaptcha(type) {
+                    if (validateRegExp.newmobile.test(this.formData.mobile)) {
+                        // 注册类型：[1: 活动; !1: 预约咨询]
+                        let method = type == 1 ? 'enrollActivity' : 'bespeak';
+
+                        service.post(api.sms_send, {
+                            'mobile': this.formData.mobile,
+                            'sms_type': method,
+                        }).then((res) => {
+                            // 验证码倒计时
+                            this.getCountdown();
+                            this.$toast(res.message)
+                        }).catch((error) => {
+                            this.$toast(error)
+                        });
+                    } else {
+                        this.$toast('请输入正确的手机号码');
+                    }
+                },
+                // 验证码倒计时
+                getCountdown() {
+                    if (this.captcha.time === 0) {
+                        this.captcha.state = false;
+                        this.captcha.text = '获取验证码'
+                        this.captcha.time = 60;
+                        return false;
+                    } else {
+                        this.captcha.state = true;
+                        this.captcha.text = this.captcha.time + 's'
+                        this.captcha.time--;
+                    }
+                    setTimeout(this.getCountdown, 1000);
+                },
+                // 打开ActionSheet
+                openAction() {
+                    if (this.pickedData.address) {
+                        this.$refs.toastChild.actionsheetOpen()
+                    } else {
+                        this.$toast('请先选择一个场次')
+                    }
+                },
+                // 活动：活动详情
+                postActivityDetail(paramsId) {
+                    service.post(api.activity_detail, {
+                            id: paramsId
+                        })
+                        .then((res) => {
+                            this.active_field = res.data.active_field
+                            this.activity_detail = res.data.activity
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 活动：活动报名
+                postActivityEnroll(formData) {
+                    service.post(api.activity_enroll, formData)
+                        .then((res) => {
+                            sessionStorage.setItem('activity_id', res.data.id)
+                            window.location.href = 'activity_success.html';
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 报名提交
+                formSubmit() {
+                    let formData = this.formData
+                    formData.activity_name = this.activity_detail.name
+                    formData.active_field = `${this.pickedData.city}，${this.pickedData.address}，${this.pickedData.time}`
+
+                    for (const key in formData) {
+                        if (!formData[key]) {
+                            this.$toast('填写不完整')
+                            return false;
+                        }
+                    }
+                    if (!validateRegExp.newmobile.test(formData.mobile)) {
+                        this.$toast('请输入正确的手机号码')
+                        return false;
+                    }
+                    this.postActivityEnroll(formData)
+                },
+                // 修复Fixed引起的错位
+                resetScrollbar(){
+                    window.scrollTo(0, 0);
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

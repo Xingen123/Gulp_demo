@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+
+<body>
+
+    <div id="app">
+        <div class="consultant-card">
+            <div class="consultant-card__bd">
+                <img class="consultant-card__avatar" :src="consult_info.headimgurl">
+                <div class="consultant-card__title">{{consult_info.role_type}}</div>
+                <div class="consultant-card__name">{{consult_info.name}}</div>
+                <!-- <div class="consultant-card__action">
+                    <button class="ui-btn ui-btn_secondary consultant-card__btn">
+                        <i class="ui-icon ui-icon-phone"></i>
+                        <span>电话联系</span>
+                    </button>
+                    <button class="ui-btn ui-btn_primary consultant-card__btn">
+                        <i class="ui-icon ui-icon-wechat"></i>
+                        <span>添加微信</span>
+                    </button>
+                </div> -->
+            </div>
+            <div class="profile-foot">
+                <div class="profile-foot__main">
+                    <a class="ui-btn ui-btn_secondary_s2" href="tel:4000-851-851">
+                        <i class="ui-icon ui-icon-service"></i>
+                        <span>客服电话：4000-851-851</span>
+                    </a>
+                    <p class="consultant-card__tip" style="color: #fff;">请于工作时间09:00-18:00联系我们</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    consult_info: ''
+                }
+            },
+            mounted() {
+                this.postConsultInfo()
+            },
+            methods: {
+                // 获取顾问接口
+                postConsultInfo(formData) {
+                    service.get(api.consult_info,{
+                        params: {
+                            token: localStorage.getItem('token')
+                        }
+                    })
+                        .then((res) => {
+                            console.log(res.data)
+                            this.consult_info = res.data
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+            }
+        })
+        
+        // 禁止回退上一页
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", function (e) {
+            WeixinJSBridge.invoke('closeWindow', {}, function (res) {
+                //alert(res.err_msg);
+            });
+        }, false);
+    </script>
+
+</body>
+
+</html>

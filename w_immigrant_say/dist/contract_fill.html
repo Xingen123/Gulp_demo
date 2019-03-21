@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-panel m-panel_shortline">
+            <div class="m-panel__hd">签约项目：<em class="ui-color-base">马耳他投资移民</em></div>
+            <!-- <div class="m-panel__bd">
+                <div class="m-requirement">
+                    <div class="m-requirement__col">
+                        <div class="m-requirement__desc">年满<em class="ui-color-error">14</em>周岁</div>
+                        <div class="m-requirement__title">年龄要求</div>
+                    </div>
+                    <div class="m-requirement__col">
+                        <div class="m-requirement__desc">无</div>
+                        <div class="m-requirement__title">居住要求</div>
+                    </div>
+                    <div class="m-requirement__col">
+                        <div class="m-requirement__desc"><em class="ui-color-error">50</em>万美金</div>
+                        <div class="m-requirement__title">投资额度</div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+
+        <div class="m-panel m-panel_shortline">
+            <div class="m-panel__hd">办理服务费　　<em class="ui-color-error">50000.00元</em></div>
+            <div class="m-panel__bd">
+                <form class="m-form">
+                    <div class="m-form-item">
+                        <div class="m-form-item__label">申请人</div>
+                        <div class="m-form-item__content">
+                            <input class="ui-input m-form__input" type="text" v-model.trim="formData.apply_name" placeholder="请输申请人姓名">
+                        </div>
+                    </div>
+                    <div class="m-form-item">
+                        <div class="m-form-item__label">身份证</div>
+                        <div class="m-form-item__content">
+                            <input class="ui-input m-form__input" type="text" v-model.trim="formData.apply_identity" placeholder="请输入证件有效号码">
+                        </div>
+                    </div>
+                    <div class="m-form-item">
+                        <div class="m-form-item__label">电子邮箱</div>
+                        <div class="m-form-item__content">
+                            <input class="ui-input m-form__input" type="text" v-model.trim="formData.apply_email" placeholder="请输入有效电子邮箱">
+                        </div>
+                    </div>
+                    <div class="m-form-item">
+                        <div class="m-form-item__label">手机号码</div>
+                        <div class="m-form-item__content">
+                            <input class="ui-input m-form__input" type="text" v-model.trim="formData.apply_mobile" placeholder="请输手机号码">
+                        </div>
+                    </div>
+                    <div class="m-form-item">
+                        <div class="m-form-item__label">居住地址</div>
+                        <div class="m-form-item__content">
+                            <textarea class="ui-textarea m-form__textarea" v-model.trim="formData.apply_address" placeholder="请输入现居住地址"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="m-submit-bar">
+            <div class="ui-fixed_bottom m-submit-bar__main">
+                <div class="m-submit-bar__text">
+                    <label class="m-submit-bar__checkbox">
+                        <input class="m-submit-bar__input" type="checkbox" v-model="haveRead" @click="readState">
+                        <span class="m-submit-bar__inner"></span>
+                    </label>
+                    我已阅读并同意<br><a class="ui-color-primary" href="javascript:;">《外联移民申请服务合同》</a>
+                </div>
+                <div class="m-submit-bar__submit">
+                    <button class="ui-btn ui-btn_primary ui-btn_square" @click="formSubmit">
+                        <span>确定签约</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="m-service-float"></div> -->
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    haveRead: true,
+                    formData:{
+                        apply_name: '',
+                        apply_identity: '',
+                        apply_email: '',
+                        apply_mobile: '',
+                        apply_address: ''
+                    },
+                    projectInfo:{
+                        goods_id: 37,
+                        goods_quantity: 1,
+                        service_charge: 5000,
+                        contract_id: 1,
+                        token: localStorage.getItem('token')
+                    }
+                }
+            },
+            mounted() {
+                
+            },
+            methods: {
+                // 阅读状态
+                readState(){
+                    this.haveRead = !this.haveRead;
+                },
+                // 签约：确定签约接口
+                postCreateOrder(formData) {
+                    service.post(api.order_create, formData)
+                        .then((res) => {
+                            window.location.href = 'contract_success.html?order_no=' + res.data.order_no;
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 报名提交
+                formSubmit() {
+                    let formData = this.formData
+                    // 判断是否统同意条款
+                    if (!this.haveRead) {
+                        this.$toast('请先阅读并同意条款')
+                        return false;
+                    }
+                    // 判断表单数据完整性
+                    for (const key in formData) {
+                        if (!formData[key]) {
+                            this.$toast('填写不完整')
+                            return false;
+                        }
+                    }
+                    // 判断手机号码
+                    if (!validateRegExp.newmobile.test(formData.apply_mobile)) {
+                        this.$toast('请输入正确的手机号码')
+                        return false;
+                    }
+                    // 数据合并
+                    formData = Object.assign(this.formData, this.projectInfo)
+                    this.postCreateOrder(formData)
+                },
+            }
+        })
+    </script>
+
+</body>
+
+</html>

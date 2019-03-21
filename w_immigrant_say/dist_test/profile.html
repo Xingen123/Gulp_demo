@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="profile-card">
+            <img class="profile-card__avatar" :src="user_info.headimgurl">
+            <div class="profile-card__name">{{user_info.username}}</div>
+            <div class="profile-card__nickname">(微信昵称：{{user_info.nickname}})</div>
+        </div>
+        <div class="profile-section">
+            <div class="profile-section__hd">注册信息</div>
+            <div class="profile-section__bd">
+                <div class="profile-items" @click="openAction('name')">
+                    <div class="profile-items__label">姓名</div>
+                    <div class="profile-items__content">
+                        {{user_info.username}}
+                    </div>
+                    <div class="profile-items__extra">
+                        <i class="ui-icon ui-icon-edit"></i>
+                    </div>
+                </div>
+                <div class="profile-items" @click="openAction('phone')">
+                    <div class="profile-items__label">手机号</div>
+                    <div class="profile-items__content">{{user_info.mobile}}</div>
+                    <div class="profile-items__extra">
+                        <i class="ui-icon ui-icon-edit"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-foot">
+            <div class="profile-foot__main">
+                <a class="ui-btn ui-btn_primary" href="tel:4000-851-851">
+                    <i class="ui-icon ui-icon-service_white"></i>
+                    <span>客服电话：4000-851-851</span>
+                </a>
+                <!-- <p class="profile-foot__tip">请于工作时间09:00-18:00联系我们</p> -->
+            </div>
+        </div>
+
+        <actionsheet ref="toastChild" :title="actionsheet.title">
+            <div class="profile-edit" v-if="actionsheet.type == 'name'" slot>
+                <div class="profile-edit__cell">
+                    <input class="ui-input profile-edit__input" type="search" v-model.trim="formData.username" placeholder="请输入您的姓名" @blur="resetScrollbar()">
+                </div>
+                <div class="profile-edit__action">
+                    <button class="ui-btn ui-btn_primary profile-edit__btn" @click="postChangeInfo">保存修改</button>
+                </div>
+            </div>
+            <div class="profile-edit" v-if="actionsheet.type == 'phone'" slot>
+                <div class="profile-edit__cell">
+                    <input class="ui-input profile-edit__input" type="text" v-model.trim="formData.mobile" placeholder="请输入手机号" @blur="resetScrollbar()">
+                </div>
+                <div class="profile-edit__cell">
+                    <input class="ui-input profile-edit__input" type="text" v-model.trim="formData.mobile_code" placeholder="请输入验证码" @blur="resetScrollbar()">
+                    <button class="ui-btn signup-form__code" type="button" @click="getCaptcha(2)" :disabled="captcha.state">{{captcha.text}}</button>
+                </div>
+                <div class="profile-edit__action">
+                    <button class="ui-btn ui-btn_primary profile-edit__btn" @click="postChangePhone">保存修改</button>
+                </div>
+            </div>
+        </actionsheet>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    user_info: {},
+                    formData: {
+                        username: '',
+                        mobile: '',
+                        mobile_code: '',
+                        code: '',
+                    },
+                    captcha: {
+                        code: '',
+                        time: 60,
+                        state: false,
+                        text: '获取验证码',
+                    },
+                    actionsheet: {
+                        title: '',
+                        type: ''
+                    }
+                }
+            },
+            mounted() {
+                this.getUserInfo()
+            },
+            methods: {
+                // 发送验证
+                getCaptcha(type) {
+                    if (validateRegExp.newmobile.test(this.formData.mobile)) {
+                        // 注册类型：[1: 注册; !1: 更新]
+                        let method = type == 1 ? 'register' : 'update_mobile';
+
+                        service.post(api.roter_validCode, {
+                            'mobile': this.formData.mobile,
+                            'sms_type': method,
+                        }).then((res) => {
+                            // 验证码倒计时
+                            this.getCountdown();
+                            this.$toast(res.message)
+                        }).catch((error) => {
+                            this.$toast(error)
+                        });
+                    } else {
+                        this.$toast('请输入正确的手机号码');
+                    }
+                },
+                // 验证码倒计时
+                getCountdown() {
+                    if (this.captcha.time === 0) {
+                        this.captcha.state = false;
+                        this.captcha.text = '获取验证码'
+                        this.captcha.time = 60;
+                        return false;
+                    } else {
+                        this.captcha.state = true;
+                        this.captcha.text = this.captcha.time + 's'
+                        this.captcha.time--;
+                    }
+                    setTimeout(this.getCountdown, 1000);
+                },
+                // 打开ActionSheet
+                openAction(e) {
+                    if (e === 'name') {
+                        this.actionsheet.title = '修改姓名'
+                    }
+                    if (e === 'phone') {
+                        this.actionsheet.title = '修改手机'
+                    }
+                    this.actionsheet.type = e
+                    this.$refs.toastChild.actionsheetOpen()
+                },
+                // 用户：获取用户信息
+                getUserInfo() {
+                    service.get(api.user_info, {
+                            params: {
+                                token: localStorage.getItem('token')
+                            }
+                        })
+                        .then((res) => {
+                            this.user_info = res.data
+                            console.log(res)
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 修改用户信息
+                postChangeInfo() {
+                    let formData = this.formData;
+                    console.log(formData)
+                    if (!formData.username) {
+                        this.$toast('填写不完整')
+                        return false;
+                    }
+                    service.post(api.user_change_info, {
+                            id: this.user_info.id,
+                            token: localStorage.getItem('token'),
+                            username: this.formData.username
+                        })
+                        .then((res) => {
+                            this.$toast(res.message)
+                            this.$refs.toastChild.actionsheetClose()
+                            Vue.set(this.user_info, 'username', this.formData.username)
+                            this.formData.username = ''
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 修改手机号码
+                postChangePhone() {
+                    let formData = this.formData;
+                    if (!formData.mobile || !formData.mobile_code) {
+                        this.$toast('填写不完整')
+                        return false;
+                    }
+                    service.post(api.user_change_change, {
+                            id: this.user_info.id,
+                            token: localStorage.getItem('token'),
+                            mobile: this.formData.mobile,
+                            mobile_code: this.formData.mobile_code,
+                        })
+                        .then((res) => {
+                            this.$toast(res.message)
+                            this.$refs.toastChild.actionsheetClose()
+                            Vue.set(this.user_info, 'mobile', this.formData.mobile)
+                            Vue.set(this.user_info, 'mobile_code', this.formData.mobile_code)
+                            this.formData.mobile = ''
+                            this.formData.mobile_code = ''
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 修复Fixed引起的错位
+                resetScrollbar(){
+                    window.scrollTo(0, 0);
+                }
+            }
+        })
+
+        // 禁止回退上一页
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", function (e) {
+            WeixinJSBridge.invoke('closeWindow', {}, function (res) {
+                //alert(res.err_msg);
+            });
+        }, false);
+    </script>
+
+</body>
+
+</html>

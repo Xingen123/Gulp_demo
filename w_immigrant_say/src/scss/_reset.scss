@@ -1,0 +1,44 @@
+@if $IE >=10 {
+	/* = Reset Mobile | MIT License | By Ryan | Update: 2018-01-14
+	------------------------------------------------------------------------------------ */
+	/* Document */
+		*, :after, :before { box-sizing: border-box; }
+		html { -ms-text-size-adjust: 100%; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-text-size-adjust: 100%; }
+	/* Sections */
+		body, div, h1, h2, h3, h4, h5, h6, dl, dt, dd, ul, ol, li, blockquote, p, pre, code, form, button, input, textarea, table, th, td, article, aside, footer, header, nav, section, figcaption, figure, main, details, menu, summary { margin: 0; padding: 0; }
+		h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
+		ul, ol { list-style: none; }
+	/* Text-level semantics */
+		a{ text-decoration: none; outline: none; -webkit-text-decoration-skip: objects; }
+		em, i { font-style: normal; }
+		dfn { font-style: italic; }
+		small { font-size: 80%; }
+		sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+		sub { bottom: -0.25em; }
+		sup { top: -0.5em; }
+	/* Embedded content */
+		img { width: 100%; border: 0; vertical-align: top; }
+		audio:not([controls]) { display: none; height: 0; }
+	/* Forms */
+		button, input, optgroup, select, textarea { font-family: inherit; font-size: 100%; -webkit-appearance: none; }
+		button, html [type="button"], [type="reset"], [type="submit"] { -webkit-appearance: button; }
+		textarea { resize: none; }
+	/* Interactive */
+		summary { display: list-item; }
+	/* Other */
+		*:focus { outline: none; }
+} @else {
+	/* = Reset
+	------------------------------------------------------------------------------------ */
+	body, div, h1, h2, h3, h4, h5, h6, dl, dt, dd, ul, ol, li, blockquote, p, pre, code, form, button, input, textarea, table, th, td, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary { margin: 0; padding: 0; }
+	html { -webkit-text-size-adjust: 100%; }
+	body { margin-left: auto; margin-right: auto; font-size: $baseFontSize; line-height:1; font-family: $baseFontFamily; color: $color-text-base; -webkit-tap-highlight-color: transparent; }
+	h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
+	ul, ol { list-style: none; }
+	a { color: $color-text-base; text-decoration: none; }
+	button, input, select, textarea { border: none; font-family: inherit; font-size: 100%; outline: none; -webkit-appearance: none; border-radius: 0; }
+	textarea { resize: none; }
+	img { vertical-align: top; }
+	em, i { font-style: normal; }
+	:focus { outline: 0; }
+}

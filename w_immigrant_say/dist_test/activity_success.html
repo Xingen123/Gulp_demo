@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-success-head">
+            <div class="m-success-head__circle">
+                <p class="m-success-head__tip">报名成功</p>
+            </div>
+            <div class="m-success-head__title">{{activity_enroll_detail.activity_name}}</div>
+            <div class="m-success-head__text">感谢您的参与，请按时参加活动</div>
+        </div>
+
+        <div class="m-panel">
+            <div class="m-panel__hd">活动报名信息</div>
+            <div class="m-panel__bd">
+                <div class="m-cell">
+                    <div class="m-cell__hd">主申请人：</div>
+                    <div class="m-cell__bd">{{activity_enroll_detail.name}}</div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">手机号码：</div>
+                    <div class="m-cell__bd">{{activity_enroll_detail.mobile}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="m-panel">
+            <div class="m-panel__hd">活动场次</div>
+            <div class="m-panel__bd">
+                <div class="activity-schedule">
+                    <div class="activity-schedule__city">{{active_field.c0}}</div>
+                    <ul class="activity-schedule__items">
+                        <li class="activity-schedule__item">
+                            <div class="activity-schedule__radio">
+                                <p class="activity-schedule__cell">
+                                    <i class="ui-icon ui-icon_sm ui-icon-local"></i>{{active_field.c1}}
+                                </p>
+                                <p class="activity-schedule__cell">
+                                    <i class="ui-icon ui-icon_sm ui-icon-time"></i>{{active_field.c2}}
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="m-service-float"></div> -->
+
+        <div class="m-tabbar">
+            <div class="ui-fixed_bottom m-tabbar__main">
+                <!-- <div class="m-tabbar__item">
+                    <a class="ui-btn ui-btn_default ui-btn_square" href="tel:4000-851-851">
+                        <i class="ui-icon ui-icon-service_people"></i><span>咨询客服</span>
+                    </a>
+                </div> -->
+                <div class="m-tabbar__item">
+                    <a class="ui-btn ui-btn_primary ui-btn_square" href="activity.html">
+                        <i class="ui-icon ui-icon-collect"></i><span>更多活动</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    activity_enroll_detail: {},
+                    active_field:{}
+                }
+            },
+            mounted() {
+                let paramsId = sessionStorage.getItem('activity_id')
+                if (paramsId) {
+                    this.postActivityEnrollDetail(paramsId)
+                } else {
+                    window.location.href = '404.html';
+                }
+            },
+            methods: {
+                // 获取微信code
+                getQueryString(param) {
+                    let reg = new RegExp("(^|&)" + param + "=([^&]*)(&|$)", "i");
+                    let r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                },
+                // 活动：活动报名
+                postActivityEnrollDetail(paramsId) {
+                    service.post(api.activity_enroll_detail, {
+                            customer_id: paramsId
+                        })
+                        .then((res) => {
+                            let arr = res.data.active_field.split('，');
+                            for (let i = 0; i < arr.length; i++) {
+                                this.active_field['c' + i] = arr[i]
+                            }
+                            res.data.mobile = res.data.mobile.replace(/^(\d{3})\d{5}(\d{3})$/,'$1*****$2')
+                            this.activity_enroll_detail = res.data
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+            }
+        })
+    </script>
+
+</body>
+
+</html>

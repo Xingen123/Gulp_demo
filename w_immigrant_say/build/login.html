@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <form class="signup" @submit.prevent="formSubmit">
+            <div class="signup-form">
+                <div class="signup-form__title">账号登录</div>
+                <div class="signup-form__cell">
+                    <input class="ui-input signup-form__input" type="text" v-model.trim="formData.mobile" placeholder="请输入注册手机号">
+                </div>
+                <div class="signup-form__cell">
+                    <input class="ui-input signup-form__input" type="password" v-model.trim="formData.password" placeholder="请输入密码">
+                </div>
+                <div class="signup-form__action">
+                    <button class="ui-btn ui-btn_primary signup-form__submit" type="submit">
+                        <span>登陆</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    formData: {
+                        mobile: '',
+                        password: '',
+                    }
+                }
+            },
+            mounted() {
+
+            },
+            methods: {
+                formSubmit() {
+                    let formData = this.formData;
+                    if (!formData.mobile || !formData.password) {
+                        this.$toast('填写不完整')
+                        return false;
+                    }
+                    service.post(api.router_login, {
+                        'token': localStorage.getItem('token'),
+                        'mobile': this.formData.mobile,
+                        'password': this.formData.password,
+                    })
+                    .then((res) => {
+                        window.location.href = 'profile.html';
+                    })
+                    .catch((error) => {
+                        this.$toast(error)
+                    });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

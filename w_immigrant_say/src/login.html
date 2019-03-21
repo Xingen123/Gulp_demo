@@ -1,0 +1,65 @@
+@@include('@@webRoot/m_doctype.html')
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <form class="signup" @submit.prevent="formSubmit">
+            <div class="signup-form">
+                <div class="signup-form__title">账号登录</div>
+                <div class="signup-form__cell">
+                    <input class="ui-input signup-form__input" type="text" v-model.trim="formData.mobile" placeholder="请输入注册手机号">
+                </div>
+                <div class="signup-form__cell">
+                    <input class="ui-input signup-form__input" type="password" v-model.trim="formData.password" placeholder="请输入密码">
+                </div>
+                <div class="signup-form__action">
+                    <button class="ui-btn ui-btn_primary signup-form__submit" type="submit">
+                        <span>登陆</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @@include('@@webRoot/m_script.html')
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    formData: {
+                        mobile: '',
+                        password: '',
+                    }
+                }
+            },
+            mounted() {
+
+            },
+            methods: {
+                formSubmit() {
+                    let formData = this.formData;
+                    if (!formData.mobile || !formData.password) {
+                        this.$toast('填写不完整')
+                        return false;
+                    }
+                    service.post(api.router_login, {
+                        'token': localStorage.getItem('token'),
+                        'mobile': this.formData.mobile,
+                        'password': this.formData.password,
+                    })
+                    .then((res) => {
+                        window.location.href = 'profile.html';
+                    })
+                    .catch((error) => {
+                        this.$toast(error)
+                    });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

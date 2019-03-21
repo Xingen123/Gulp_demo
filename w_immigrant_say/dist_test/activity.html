@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-card">
+            <div class="m-card__hd">
+                <div class="m-card__title">
+                    全部活动
+                </div>
+                <div class="m-card__extra" @click="openDrawer">
+                    筛选<i class="ui-icon ui-icon-filter m-card__icon"></i>
+                </div>
+            </div>
+            <div class="m-card__bd">
+                <a class="activity-item" v-for="item in activity_list" :key="item.id" :href="'activity_details.html?id=' + item.id">
+                    <img class="activity-item__img" :src="item.cover_image">
+                    <div class="activity-item__intro">
+                        <div class="activity-item__end">
+                            <div class="activity-item__title">{{item.name}}</div>
+                            <div class="activity-item__time">
+                                <i class="ui-icon ui-icon_sm ui-icon-time_white"></i>{{item.begin_time}} - {{item.end_time}}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <loadmore v-if="activity_city_list.current_page === activity_city_list.last_page"></loadmore>
+
+        <transition name="fade">
+            <div class="wl-mask" v-if="show" @click="closeDrawer"></div>
+        </transition>
+        <transition name="drawer">
+            <div class="m-drawer" v-if="show">
+                <div class="drawer-filter">
+                    <div class="drawer-filter__hd">按地区</div>
+                    <div class="drawer-filter__bd">
+                        <div class="drawer-filter__group">
+                            <a class="drawer-filter__tag" :class="{'is-active':checkedCity===999}" @click="chooseCity(999)">全部</a>
+                        </div>
+                        <div class="drawer-filter__group">
+                            <a class="drawer-filter__tag" :class="{'is-active':checkedCity===item.id}" v-for="(item, index) in activity_city_list"
+                                @click="chooseCity(item.id)">{{item.name}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="drawer-footer">
+                    <button class="ui-btn ui-btn_default drawer-footer__btn" @click="closeDrawer">取消</button>
+                    <button class="ui-btn ui-btn_primary drawer-footer__btn" @click="submitfilter">确定</button>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <style scoped>
+        body, html { height: auto; }
+        #app{ height: auto; }
+    </style>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    show: false,
+                    activity_list: [],
+                    activity_city_list: [],
+                    checkedCity: null,
+                    loadingMore: false,
+                    current_page: 1
+                }
+            },
+            mounted() {
+                this.postActivityList(1)
+                this.postActivityCityList()
+
+                window.addEventListener('scroll', () => {
+                    let scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+                    if (scrollTop + window.innerHeight >= document.body.offsetHeight - 50) {
+                        if (!this.loadingMore) {
+                            this.postActivityList(2)
+                        }
+                    }
+                });
+            },
+            methods: {
+                // 活动：活动列表
+                postActivityList(page, areasId) {
+                    this.loadingMore = true
+                    let params = {}
+                    if (page) {
+                        params['page'] = page
+                    }
+                    if (areasId >= 0 && areasId < 999) {
+                        params['areas_id'] = areasId
+                    }
+                    service.post(api.activity_list, params)
+                        .then((res) => {
+                            console.log(res)
+                            if (page > res.data.last_page) {
+                                return false;
+                            } else {
+                                this.activity_list = [...this.activity_list, ...res.data.data]
+                                this.loadingMore = false
+                            }
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 活动：城市列表
+                postActivityCityList() {
+                    service.post(api.activity_city_list)
+                        .then((res) => {
+                            this.activity_city_list = res.data
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 选择城市
+                chooseCity(index) {
+                    if (this.checkedCity === index) {
+                        this.checkedCity = null
+                    } else {
+                        this.checkedCity = index
+                    }
+                },
+                // 关闭抽屉
+                closeDrawer() {
+                    this.show = false
+                },
+                // 打开抽屉
+                openDrawer() {
+                    this.show = !this.show
+                },
+                // 提交筛选
+                submitfilter() {
+                    if (this.checkedCity != null) {
+                        this.activity_list = []
+                        this.postActivityList(1, this.checkedCity)
+                        this.closeDrawer()
+                    } else {
+                        this.$toast('请先选择一个')
+                    }
+                }
+            }
+        })
+
+        // 禁止回退上一页
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", function (e) {
+            WeixinJSBridge.invoke('closeWindow', {}, function (res) {
+                //alert(res.err_msg);
+            });
+        }, false);
+    </script>
+
+</body>
+
+</html>

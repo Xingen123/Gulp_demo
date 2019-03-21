@@ -1,0 +1,117 @@
+@@include('@@webRoot/m_doctype.html')
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="profile-card">
+            <img class="profile-card__avatar" :src="user_info.headimgurl">
+            <div class="profile-card__name">{{user_info.username}}</div>
+            <div class="profile-card__nickname">(微信昵称：{{user_info.nickname}})</div>
+        </div>
+        <div class="m-panel" v-if="user_project_list">
+            <div class="m-panel__hd">在办项目</div>
+            <div class="m-panel__bd">
+                <div class="profile-order">
+                    <div class="profile-order__hd">
+                        <div class="profile-order__title">马耳他投资移民</div>
+                        <div class="profile-order__update">更新：2018-10-20</div>
+                    </div>
+                    <div class="profile-order__bd">
+                        <div class="profile-order__label">在办状态：</div>
+                        <div class="profile-order__status"><strong class="ui-color-success">已签约</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="m-panel">
+            <div class="m-panel__hd">预约记录</div>
+            <div class="m-panel__bd">
+                <div class="profile-record" v-for="item in user_consult_list">
+                    <div class="profile-record__cell">
+                        <div class="profile-record__hd">预约咨询项目：</div>
+                        <div class="profile-record__bd">
+                            <strong class="ui-color-base">{{item.project_name}}</strong>
+                        </div>
+                    </div>
+                    <div class="profile-record__cell">
+                        <div class="profile-record__hd">提交时间：</div>
+                        <div class="profile-record__bd">{{item.created_at}}</div>
+                    </div>
+                    <div class="profile-record__cell">
+                        <div class="profile-record__hd">预约状态：</div>
+                        <div class="profile-record__bd">{{item.crm_customer.customer_status}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-foot">
+            <div class="profile-foot__main">
+                <a class="ui-btn ui-btn_primary" href="tel:4000-851-851">
+                    <i class="ui-icon ui-icon-service_white"></i>
+                    <span>客服电话：4000-851-851</span>
+                </a>
+                <p class="profile-foot__tip">请于工作时间09:00-18:00联系我们</p>
+            </div>
+        </div>
+    </div>
+
+    @@include('@@webRoot/m_script.html')
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    user_info: {},
+                    user_project_list: null,
+                    user_consult_list: {}
+                }
+            },
+            mounted() {
+                this.getUserInfo()
+            },
+            methods: {
+                // 用户：获取用户信息
+                getUserInfo() {
+                    service.get(api.user_info, {
+                            params: {
+                                token: localStorage.getItem('token')
+                            }
+                        })
+                        .then((res) => {
+                            this.user_info = res.data
+                            this.postUserConsultList()
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 用户：咨询预约记录
+                postUserConsultList() {
+                    service.post(api.user_consult_list, {
+                        mobile: this.user_info.mobile,
+                        token: localStorage.getItem('token')
+                    })
+                        .then((res) => {
+                            this.user_consult_list = res.data
+                            console.log(this.user_consult_list)
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                }
+            }
+        })
+
+        // 禁止回退上一页
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", function (e) {
+            WeixinJSBridge.invoke('closeWindow', {}, function (res) {
+                //alert(res.err_msg);
+            });
+        }, false);
+    </script>
+
+</body>
+
+</html>

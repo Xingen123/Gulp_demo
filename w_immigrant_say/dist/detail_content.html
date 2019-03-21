@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app"  v-cloak>
+        <div class="content_detail" style="background:white;">
+            <h2>{{contentText.name}}</h2>
+            <div style="color:gray;">{{contentText.author}} <span style="margin-left:15px;">{{contentText.created_at}}</span></div>
+            <img :src="contentText.cover" alt="">
+            <div class="body_text" v-html="contentText.body">{{contentText.body}}</div>
+        </div>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    contentText: {}
+                }
+            },
+            mounted() {
+                this.content()
+            },
+            methods: {
+                content() {
+                    service.post(api.articles_detail, {
+                            token: api.api_token,
+                            article_id: localStorage.getItem('articleId')
+                        })
+                        .then((sea) => {
+                            console.log(sea)
+                            this.contentText = sea.data.articles
+                        })
+                        .catch((error) => {
+                            console.log(`222：` + error)
+                            this.$toast(error)
+                        });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

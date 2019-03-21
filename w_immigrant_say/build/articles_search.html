@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="app" class="xeBG" v-cloak>
+        <div class="header">
+            <div>
+                <i class="search" :class="{ active: searchX }"></i>
+                <input type="text" class="input_search" placeholder="请输入文章标题关键字" v-model="input" @focus="inText()" @blur="outText()">
+                <div class="search_go" v-show="search"  @click.stop="goSearch(1)">搜索</div>
+            </div>
+        </div>
+       <!-- tab -->
+        <ul class="q_tab">
+                <li v-for="(title,index) in tabTwo" @click="tabBag(index)" :class="{q_active:cur==index}">{{title}}</li>
+        </ul> 
+        <ul class="box" >
+            <li class="box-content"  v-for="(item,index) in tagslist" @click="goNext(item)"  :key="index" >
+                    <img :src="item.cover" alt="" class="img_one">
+                    <div class="contet_border">
+                        <div class="content_text">
+                            <div class="first_p">{{item.name}}</div>
+                            <div class="two_p">{{item.summary}}</div>
+                        </div>
+                        <div class="img_two"></div>
+                    </div>
+            </li>
+        </div>
+       
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    cur:0,
+                    tabTwo:["项目分类","国家地区"],
+                    tagslist:[],
+                    input:"",
+                    search:false,
+                    searchX:false,
+                }
+            },
+
+            mounted() {
+                this.articles()
+            },
+            methods: {
+                // tab切换
+                tabBag(index){
+                    console.log(index)
+                    this.cur = index;
+                    if(index == 0) {
+                        this.articles()
+                        return;
+                    }
+
+                    //国家
+                    service.post(api.articles_areas,{
+                        // token:api.api_token
+                    })
+                    .then((res) =>{
+                        this.tagslist = res.data.areas
+                    })
+                    .catch((error) => {
+                        console.log(`222：`+error)
+                        this.$toast(error)
+                    });  
+                },
+                inText(){
+                    this.searchX = true
+                    this.search = true
+                },
+                outText(){
+                    let inputLg = this.input.length
+                    if(inputLg === 0){
+                        this.searchX = false
+                        this.search = false
+                    }
+                },
+                goSearch(num){
+                    let inputLg = this.input.length
+                    if(inputLg === 0){
+                        this.searchX = true
+                        this.search = true
+                        this.$toast("请输入内容")
+                    }else{
+                        service.post(api.articles_search,{
+                            article_name:this.input,
+                            page:1,
+                            perPage:10
+                        })
+                        .then((res) => {
+                            let articles = res.data.articles.data;                            
+                            if (articles.length == 0){
+                                this.$toast("暂没有想要的数据");
+                                return;
+                            }else{
+                                localStorage.setItem('article',JSON.stringify(articles));
+                                window.location.href = `articles_detail.html`;
+                            }
+                            
+                        })
+                        .catch((error) => {
+                            console.log(`222：`+error)
+                            this.$toast(error)
+                        });
+                        return;
+                        let item = {
+                            name:this.input,
+                            search:true
+                        }
+
+                        
+                    }
+                    // service.post(api.articles_search,{
+                    //     article_name:this.input,
+                    //     perPage:10,
+                    //     page:1
+                    // })
+                    // .then((sea) =>{
+                    //     let atLength = sea.data.articles.data
+                    //     if(atLength.length == 0){
+                    //         this.$toast("暂无数据")
+                    //     }else{
+                           
+                        //     localStorage.setItem('atLength',JSON.stringify(atLength));
+                        //     window.location.href = `articles_detail.html`
+                        // }
+                    // })
+                    // .catch((error) => {
+                    //     console.log(`222：`+error)
+                    //     this.$toast(error)
+                    // });
+                },
+                goNext(item){   
+                    localStorage.setItem('item', JSON.stringify(item));
+                    window.location.href = `articles_detail.html`
+                   
+                },
+                articles() {
+                    
+                    service.post(api.articles_list,{
+                       
+                    })
+                    .then((res) => {
+                        this.tagslist = res.data.tags
+                        console.log(res.data.tags)
+                        // this.$toast(res.message)
+                    })
+                    .catch((error) => {
+                        console.log(`222：`+error)
+                        this.$toast(error)
+                    });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

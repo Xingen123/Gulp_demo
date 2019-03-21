@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+<body>
+
+    <div id="app" v-cloak></div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    
+                }
+            },
+            mounted() {
+                let wxcode  = this.getQueryString('code');
+                let target = this.getQueryString('target')
+                this.interface_login(wxcode, target);
+            },
+            methods: {
+               //获取微信code
+               getQueryString(param) {
+                    let reg = new RegExp("(^|&)" + param + "=([^&]*)(&|$)", "i");
+                    let r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                },
+                interface_login(wxcode, target){
+                    let isUnRegisterCallback = (token) => {
+                        console.log('未注册');
+                        window.location.href = 'signup.html';
+                    };
+                    let isRegisterCallback = () => {
+                        console.log('已注册');
+                        if (target) {
+                            window.location.href = target + '.html';
+                        } else {
+                            window.location.href = 'profile.html';
+                        }
+                    };
+                    service.post(api.roter_login, {
+                        'code': wxcode
+                    })
+                    .then((res) => {
+                        if (res.data.status == 0) {
+                            // 未注册
+                            isUnRegisterCallback();
+                        } else {
+                            // 已注册
+                            isRegisterCallback();
+                        }
+                        localStorage.setItem('token', res.data.token)
+                    })
+                    .catch((error) => {
+                        this.$toast(error)
+                        // if (error == '获取openid失败') {
+                        //     window.location.href = prodRedirectUrl;
+                        //     return false;
+                        // }
+                    });
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

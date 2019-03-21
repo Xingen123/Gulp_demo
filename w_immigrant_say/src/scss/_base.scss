@@ -1,0 +1,221 @@
+/* = Global
+------------------------------------------------------------------------------------ */
+	body,
+	html{
+		min-height: 100%;
+	}
+	body {
+		font-family: $font-family; line-height:1; color: $color-text-base; background-color: $fill-body;
+	}
+	#app{
+		min-height: 100%;
+	}
+	[v-cloak] {
+		display: none;
+	}
+	.clearfix:after{
+		content: ""; display: table; clear: both;
+	}
+/* = Icon
+------------------------------------------------------------------------------------ */
+	.ui-icon {
+		display: inline-block;
+		width: 38px; height: 38px;
+		background-repeat: no-repeat;
+		background-size: 100%;
+		vertical-align: top;
+	}
+	.ui-icon_sm{
+		width: 26px; height: 26px;
+	}
+
+	.ui-icon-hot{
+		background-image: url('../images/sprite/icon_hot.png');
+	}
+	.ui-icon-close{
+		background-image: url('../images/sprite/icon_close.png');
+	}
+	.ui-icon-close_gary{
+		background-image: url('../images/sprite/icon_close_gary.png');
+	}
+	.ui-icon-contract{
+		background-image: url('../images/sprite/icon_contract.png');
+	}
+	.ui-icon-filter{
+		background-image: url('../images/sprite/icon_filter.png');
+	}
+	.ui-icon-order{
+		background-image: url('../images/sprite/icon_order.png');
+	}
+	.ui-icon-service{
+		background-image: url('../images/sprite/icon_service.png');
+	}
+	.ui-icon-service_white{
+		background-image: url('../images/sprite/icon_service_white.png');
+	}
+	.ui-icon-service_people{
+		background-image: url('../images/sprite/icon_service_people.png');
+	}
+	.ui-icon-submit{
+		background-image: url('../images/sprite/icon_submit.png');
+	}
+	.ui-icon-phone{
+		background-image: url('../images/sprite/icon_phone.png');
+	}
+	.ui-icon-wechat{
+		background-image: url('../images/sprite/icon_wechat.png');
+	}
+	.ui-icon-edit{
+		background-image: url('../images/sprite/icon_edit.png');
+	}
+	.ui-icon-calendar{
+		background-image: url('../images/sprite/icon_calendar.png');
+	}
+	.ui-icon-enroll{
+		background-image: url('../images/sprite/icon_enroll.png');
+	}
+	.ui-icon-collect{
+		background-image: url('../images/sprite/icon_collect.png');
+	}
+	.ui-icon-document{
+		background-image: url('../images/sprite/icon_document.png');
+	}
+	.ui-icon-pay{
+		background-image: url('../images/sprite/icon_pay.png');
+	}
+
+
+	.ui-icon-time{
+		background-image: url('../images/sprite/icon_sm_time.png');
+	}
+	.ui-icon-time_white{
+		background-image: url('../images/sprite/icon_sm_time_white.png');
+	}
+	.ui-icon-local{
+		background-image: url('../images/sprite/icon_sm_local.png');
+	}
+
+	.ui-icon-success_lg{
+		background-image: url('../images/icon_success_lg.png');
+	}
+	.ui-icon-error_lg{
+		background-image: url('../images/icon_error_lg.png');
+	}
+/* = UI - Lauout
+------------------------------------------------------------------------------------ */
+	.ui-overflow-hidden{
+		overflow: hidden;
+	}
+/* = UI - Font
+------------------------------------------------------------------------------------ */
+	.ui-color-base{
+		color: $color-text-base;
+	}
+	.ui-color-primary{
+		color: $brand-primary;
+	}
+	.ui-color-success{
+		color: $brand-success;
+	}
+	.ui-color-error{
+		color: $brand-error;
+	}
+/* = UI - Form
+------------------------------------------------------------------------------------ */
+	.ui-input,
+	.ui-textarea{
+		width: 100%;
+		padding: 18px 26px;
+		border: 0;
+		background-color: transparent;
+		@include placeholder {
+			color: $color-text-placeholder;
+		}
+	}
+	
+	.ui-btn{
+		@include flex-box; @include align-items(center); @include justify-content(center);
+		position: relative;
+		width: 100%; height: 98px;
+		margin-left: auto; margin-right: auto;
+		border: 0; border-radius: 50px;
+		background-color: transparent;
+		font-size: 30px;
+		@include ellipsis;
+		&.is-plain{
+			background-color: transparent;
+		}
+		.ui-icon + span{
+			margin-left: 10px;
+		}
+	}
+	.ui-btn_square{
+		border-radius: 0;
+	}
+	.ui-btn_sm{
+		width: 330px; height: 90px;
+	}
+	.ui-btn_default{
+		background-color: #fff;
+		color: $color-text-secondary;
+		&.is-plain{
+			@include border(all, $color-text-secondary);
+		}
+	}
+	.ui-btn_primary{
+		background-color: $button-primary;
+		color: #fff;
+		&.is-plain{
+			@include border(all, $button-primary);
+			color: $button-primary;
+		}
+	}
+	.ui-btn_secondary{
+		background-color: $button-secondary;
+		&.is-plain{
+			@include border(all, $button-secondary);
+			color: $button-secondary;
+		}
+	}
+	.ui-btn_secondary_s2{
+		background: linear-gradient(0deg,#F5EBCB,#FDF6E1);
+		box-shadow: 0 0 25px 0 rgba(179, 168, 136, .35);
+		color: $brand-primary;
+	}
+
+	.ui-fixed_top,
+	.ui-fixed_bottom{
+		position: fixed; left: 0;
+		width: 100%; transform: translate3d(0, 0, 0);
+	}
+	.ui-fixed_top{
+		top: 0; 
+	}
+	.ui-fixed_bottom{
+		bottom: 0;
+	}
+/* = VUE - Animated
+------------------------------------------------------------------------------------ */
+	.fade-enter-active,
+	.fade-leave-active {
+		transition: opacity .3s;
+	}
+	.fade-enter,
+	.fade-leave-to{
+		opacity: 0;
+	}
+	
+	.drawer-enter-active {
+		transform: translateX(0);
+	}
+	.drawer-enter,
+	.drawer-leave-to{
+		transform: translateX(100%);
+	}
+
+	.slideOutUp-leave-to{
+		transform: translateY(-100%);
+	}
+	.slideOutUp-leave-active {
+		transition: all .5s;
+	}

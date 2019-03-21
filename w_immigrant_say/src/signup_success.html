@@ -1,0 +1,44 @@
+@@include('@@webRoot/m_doctype.html')
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-result">
+            <div class="m-result__hd">
+                <i class="ui-icon ui-icon-success_lg m-result__icon"></i>
+                <p>您已注册成功！</p>
+            </div>
+            <div class="m-result__bd">
+                <p>我们的资深移民顾问将会与您联系，为您提供专属定制方案。</p>
+            </div>
+            <div class="m-result__ft">
+                <p class="m-result__tip">点击下方按钮了解更多移民产品</p>
+                <a class="ui-btn ui-btn_primary" href="product.html">
+                    <span>了解更多移民产品</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @@include('@@webRoot/m_script.html')
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+
+                }
+            },
+            mounted() {
+
+            },
+            methods: {
+
+            }
+        })
+    </script>
+
+</body>
+
+</html>

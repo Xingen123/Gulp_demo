@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-success-head">
+            <div class="m-success-head__circle">
+                <p class="m-success-head__tip">报名成功</p>
+                <p class="m-success-head__project">马耳他投资移民</p>
+            </div>
+            <div class="m-success-head__text">本次签约合同有效期为1个月<br>有效期内未完成缴费，本次签约合同将自动失效。 </div>
+        </div>
+
+        <div class="m-panel">
+            <div class="m-panel__hd">签约信息</div>
+            <div class="m-panel__bd">
+                <div class="m-cell">
+                    <div class="m-cell__hd">主申请人：</div>
+                    <div class="m-cell__bd">杨鹤鸣</div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">身份证号：</div>
+                    <div class="m-cell__bd">1230000000000</div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">手机号码：</div>
+                    <div class="m-cell__bd">13812345678</div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">电子邮箱：</div>
+                    <div class="m-cell__bd">651462770@qq.com</div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">居住地址：</div>
+                    <div class="m-cell__bd">上海市静安区南京西路1000号1001室</div>
+                </div>
+            </div>
+        </div>
+        <div class="m-panel">
+            <div class="m-panel__hd">费用信息</div>
+            <div class="m-panel__bd">
+                <div class="m-cell">
+                    <div class="m-cell__hd">办理服务费：</div>
+                    <div class="m-cell__ft"><span class="ui-color-error">￥ 50000 元</span></div>
+                </div>
+                <div class="m-cell">
+                    <div class="m-cell__hd">GPA升学辅导：</div>
+                    <div class="m-cell__ft"><span class="ui-color-error">￥ 5000 元</span></div>
+                </div>
+                <div class="m-cell m-cell_last">
+                    <div class="m-cell__hd">总计：</div>
+                    <div class="m-cell__ft"><span class="ui-color-error">¥ 55000<em>元</em></span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="m-service-float"></div> -->
+
+        <div class="m-tabbar">
+            <div class="ui-fixed_bottom m-tabbar__main">
+                <!-- <div class="m-tabbar__item">
+                    <button class="ui-btn ui-btn_default ui-btn_square">
+                        <i class="ui-icon ui-icon-document"></i><span>查看合同</span>
+                    </button>
+                </div> -->
+                <div class="m-tabbar__item">
+                    <button class="ui-btn ui-btn_primary ui-btn_square">
+                        <i class="ui-icon ui-icon-pay"></i><span>立即支付</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    // 签约：确定签约接口
+                    postCreateOrder(formData) {
+                        service.post(api.order_create, formData)
+                            .then((res) => {
+                                window.location.href = 'contract_success.html?order_no=' + res.data.order_no;
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+                    },
+                }
+            },
+            mounted() {
+                
+            },
+            methods: {
+                
+            }
+        })
+    </script>
+
+</body>
+
+</html>

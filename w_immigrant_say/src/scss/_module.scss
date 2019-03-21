@@ -1,0 +1,441 @@
+/* = Modal - Layout
+------------------------------------------------------------------------------------ */
+/* 标 签 栏 Tabbar  */
+    .m-tabbar{
+        height: 98px;
+    }
+    .m-tabbar__main{
+        @include flex-box;
+        z-index: $zindex-menu;
+        height: 98;
+        text-align: center; text-transform: uppercase;
+        box-shadow: 0 0 25px 0 rgba(179, 168, 136, .35);
+    }
+    .m-tabbar__item{
+        @include flex-box; @include flex-direction(column); @include justify-content(center); @include flex-col;
+    }
+/* 表　　单 Form  */
+	.m-form-item{
+		@include flex-box;
+		margin-bottom: 34px;
+	}
+	.m-form-item__label{
+		width: 180px;
+		padding-top: 28px;
+		color: $brand-primary;
+	}
+	.m-form-item__content{
+		@include flex-box; @include flex-col;
+		@include border(all, $border-color-base, 2);
+	}
+	.m-form__input{
+		@include flex-col;
+		width: 100%; height: 88px;
+	}
+	.m-form__textarea{
+		height: 176px;
+	}
+	.m-form__code{
+		position: relative;
+		width: 175px; height: auto;
+		border-radius: 0;
+		font-size: 26px; color: $brand-primary;
+		&:before{
+			content: '';
+			position: absolute; left: 0; top: 20%;
+			width: 2px; height: 60%;
+			background-color: $border-color-base;
+		}
+		&:disabled{
+			color: $color-text-placeholder;
+		}
+    }
+/* 提交标栏 SubmitBar  */
+    .m-submit-bar{
+        height: 98px;
+    }
+    .m-submit-bar__main{
+        @include flex-box;
+        z-index: $zindex-menu;
+        height: 98;
+        text-align: center; text-transform: uppercase;
+        box-shadow: 0 0 25px 0 rgba(179, 168, 136, .35);
+    }
+    .m-submit-bar__text{
+        @include flex-box; @include flex-direction(column); @include justify-content(center); @include flex-col;
+        position: relative;
+        background-color: #fff;
+        font-size: 28px; line-height: 35px; color: $color-text-secondary;
+    }
+    .m-submit-bar__submit{
+        @include flex-box; @include flex-direction(column); @include justify-content(center);
+        width: 250px;
+    }
+	.m-submit-bar__checkbox{
+        position: absolute; left: 0; top: 0; bottom: 0;
+        width: 100%;
+    }
+	.m-submit-bar__input {
+		position: absolute; top: 0; left: 0;
+		width: 100%; height: 100%;
+		border: 0 none;
+		appearance: none;
+		opacity: 0;
+		&:checked{
+			+ .m-submit-bar__inner {
+				background-image: url('../images/sprite/radio_checked_yellow.png');
+			}
+		}
+	}
+	.m-submit-bar__inner{
+		position: absolute; left: 24px; top: 50%;
+		width: 38px; height: 38px;
+		margin-top: -19px;
+		border-radius: 38px;
+		background-image: url('../images/sprite/radio_def.png');
+		background-repeat: no-repeat;
+		background-size: 100%;
+    }
+/* 结 果 页 Result */
+    .m-result{
+        height: 100%;
+        padding: 60px 24px 0 24px;
+        background-color: #fff;
+        text-align: center;
+    }
+    .m-result__icon{
+        width: 400px; height: 320px;
+        margin-bottom: 50px;
+    }
+    .m-result__hd{
+        font-size: 48px; color: $button-primary;
+    }
+    .m-result__bd{
+        height: 270px;
+        padding-top: 40px; margin-top: 60px;
+        @include border(top);
+        font-size: 30px; line-height: 44px; color: $color-text-secondary; text-align: left;
+    }
+    .m-result__ft{
+        padding: 0 122px;
+    }
+    .m-result__tip{
+        margin-bottom: 30px;
+        font-size: 26px; color: $color-text-placeholder;
+    }
+/* 内容卡片 Card */
+    .m-card{
+        background-color: #fff;
+    }
+    .m-card__hd{
+        @include flex-box;
+        padding: 34px 24px 18px 24px;
+    }
+    .m-card__bd{
+        padding: 24px;
+    }
+    .m-card__title{
+        @include flex-box; @include align-items(center); @include flex-col;
+        font-size: 42px; font-weight: 700;
+    }
+    .m-card__extra{
+        @include flex-box; @include align-items(center);
+        font-size: 30px; color: $color-text-tertiary;
+    }
+    .m-card__icon{
+        margin-left: 10px;
+    }
+/* 抽　　屉 Drawer */
+    .m-drawer{
+        position: fixed; top: 0; right: 0; z-index: $zindex-drawer;
+        width: 574px; height: 100%;
+        padding-left: 24px;
+        background-color: #fff;
+        transition: .3s;
+        -webkit-overflow-scrolling: touch;
+    }
+/* 成功头部 Success */
+	.m-success-head{
+		height: 410px;
+		padding: 0 110px;
+		background: url('../images/success_bd.png') no-repeat;
+		background-size: 100%;
+		color: $color-text-base-inverse; text-align: center;
+		overflow: hidden;
+	}
+	.m-success-head__circle{
+		@include flex-box; @include align-items(center); @include justify-content(center); @include flex-direction(column);
+		margin: -30px auto;
+		width: 377px; height: 377px;
+        background: url('../images/success_tip.png') no-repeat;
+        background-size: cover;
+	}
+	.m-success-head__tip{
+		font-size: 50px; color: $brand-warning; font-weight: 800;
+	}
+	.m-success-head__project{
+		margin-top: 24px;
+		font-size: 30px; color: $brand-primary;
+	}
+	.m-success-head__title{
+		margin-bottom: 14px;
+		font-size: 30px;
+	}
+	.m-success-head__text{
+		font-size: 24px; line-height: 30px;
+    }
+/* 面　　板 Panel */
+	.m-panel{
+		margin-bottom: 14px;
+		background-color: #fff;
+		font-size: 30px;
+    }
+    .m-panel_shortline{
+        .m-panel__hd{
+            padding: 0;
+            margin: 0 24px;
+        }
+    }
+	.m-panel__hd{
+		@include flex-box; @include align-items(center);
+		height: 90px;
+		padding: 0 24px;
+		@include border(bottom);
+		color: $brand-primary; font-weight: 700;
+		.ui-icon{
+			margin-right: 15px;
+		}
+	}
+	.m-panel__bd{
+		padding: 24px;
+    }
+/* 浮动客服 Service */
+    .m-service-float{
+        position: fixed; right: 0; bottom: 30%;
+        width: 158px; height: 164px;
+        background: url('../images/float_service.png') no-repeat;
+        background-size: 100%;
+    }
+/* 单 元 格 Cell */
+	.m-cell{
+		@include flex-box;
+        padding: 9px 0;
+		font-size: 28px; line-height: 45px;
+		&:last-child{
+			margin-bottom: 0;
+		}
+    }
+    .m-cell_last{
+        @include border(top);
+        .m-cell__hd{
+            color: $color-text-base;
+        }
+        .m-cell__ft{
+            font-size: 38px; line-height: 1;
+            em{
+                font-size: 28px;
+            }
+        }
+    }
+	.m-cell__hd{
+		min-width: 146px;
+        color: $color-text-tertiary;
+        + .m-cell__ft{
+            @include flex-col; text-align: right;
+        }
+	}
+	.m-cell__bd{
+		@include flex-col;
+    }
+    .m-cell__ft{
+        @include flex-box; @include align-items(center); @include justify-content(flex-end);
+    }
+    /* 产品列表：Product */
+    .m-product{
+		display: block;
+		margin-bottom: 24px;
+		border-radius: 8px;
+		box-shadow: 0 0 25px 0 rgba(179, 168, 136, .35);
+		white-space: normal;
+		overflow: hidden;
+	}
+	.m-product__hd{
+		position: relative;
+		background-repeat: no-repeat;
+		height: 370px;
+	}
+	.m-product__cover{
+		height: 370px;
+	}
+	.m-product__intro{
+		position: absolute; top: 50%; right: 0; left: 0;
+		padding: 20px;
+		margin-top: -74px;
+		background: rgba(0,0,0,.3);
+		line-height: 1; color: #fff; text-align: center;
+	}
+	.m-product__title{
+		display: inline-block;
+		padding: 0 5px 10px 5px;
+		@include border(bottom, #fff, 1);
+		font-size: 52px; font-weight: 700;
+	}
+	.m-product__desc{
+		margin-top: 16px;
+		font-size: 28px;
+	}
+/* 产品条件：Requirement */
+	.m-requirement{
+		@include flex-box;
+		padding: 20px 0;
+	}
+	.m-requirement__col{
+		@include flex-col;
+		@include border(right, $border-color-base, 2);
+		text-align: center;
+		&:last-child{
+			@include border(none);
+		}
+	}
+	.m-requirement__desc{
+		margin-bottom: 12px;
+		font-size: 30px; color: $color-text-base; font-weight: 700;
+	}
+	.m-requirement__title{
+		font-size: 24px; color: $color-text-tertiary; 
+	}
+/* = Component - Layout
+------------------------------------------------------------------------------------ */
+/* 遮 罩 框 Mask*/
+    .wl-mask{
+        position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: $zindex-modal;
+        background-color: rgba(0,0,0,.7);
+    }
+    .wl-mask_animation{
+        animation: anim-mask .3s forwards;
+    }
+    @keyframes anim-mask {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+/* 轻 提 示 Toast*/
+	.wl-toast {
+		font-size: 26px;
+	}
+	.wl-toast__mask {
+		position: fixed; top: 0; right: 0; left: 0; bottom: 0; z-index: 1000;
+	}
+	.wl-toast__text {
+		position: fixed; top: 50%; left: 50%; z-index: 5000;
+		max-width: 80%;
+		padding: 1em;
+		transform: translate(-50%,-50%);
+		background: rgba(17, 17, 17, 0.7);
+		border-radius: 6px;
+		color: #fff; line-height: 1.3; text-align: center;
+	}
+/* 动作面板 ActionSheet */
+    .wl-actionsheet-wrap{
+        position: relative;
+        border-radius: 35px 35px 0 0;
+        background-color: #fff;
+    }
+    .wl-actionsheet-wrap_bottom{
+        position: fixed; right: 0; bottom: 0; left: 0; z-index: $zindex-popover;
+    }
+    .wl-actionsheet-wrap__close{
+        position: absolute; top: 30px; right: 30px;
+    }
+    .wl-actionsheet-wrap__hd{
+        @include border(bottom);
+        padding: 45px 0;
+        font-size: 42px; font-weight: 700; text-align: center;
+    }
+    .wl-actionsheet-wrap__bd{
+        padding: 25px 54px 55px 54px;
+    }
+/* 加载更多 Loadmore */
+    .wl-loadmore{
+        display: flex; align-items: center;
+        padding: 30px 148px;
+    }
+    .wl-loadmore__line{
+        display: flex; flex-grow: 1;
+        height: 1px;
+        background: #ADADAD;
+    }
+    .wl-loadmore__text{
+        display: flex; align-items: center; justify-content: center;
+        margin-left: 20px; margin-right: 20px;
+        font-size: 28px; color: $color-text-tertiary;
+    }
+/* 消息通知 NoticeBar */
+    .wl-notice-bar{
+        @include flex-box; @include align-items(center);
+        padding: 14px 24px 14px 24px;
+        background-color: #E6F4FF;
+        font-size: 24px; line-height: 1.3; color: #45A4F4;
+    }
+    .wl-notice-bar__content{
+        @include flex-col;
+    }
+    .wl-notice-bar__extra{
+        margin-left: 40px;
+    }
+    .wl-notice-bar__desc{
+        margin-top: 5px;
+    }
+/* 模 态 框 Modal*/
+    .wl-modal{
+        position: fixed; top: 50%; left: 50%; z-index: $zindex-modal;
+        width: 76%;
+        border-radius: 30px;
+        background-color: #fff;
+        transform: translate3d(-50%,-50%,0);
+        animation: anim-open .2s forwards;
+        overflow: hidden;
+    }
+    .wl-modal_alert{
+        .wl-modal__ft{
+            padding-bottom: 40px;
+            @include border(none);
+        }
+        .wl-modal__alert{
+            width: 250px; height: 76px;
+        }
+    }
+    .wl-modal__hd{
+        padding: 50px 32px 0 32px;
+        font-size: 38px; text-align: center;
+    }
+    .wl-modal__bd{
+        padding: 40px 32px;
+        font-size: 28px; line-height: 42px; color: $color-text-tertiary;
+    }
+    .wl-modal__ft{
+        @include flex-box;
+        @include border(top);
+        text-align: center;
+    }
+    .wl-modal__btn{
+        @include flex-col;
+        height: 90px;
+        border-radius: 0;
+        &:not(:first-child){
+            @include border(left);
+        }
+    }
+    .wl-modal__cancel{
+        color: $color-text-tertiary;
+    }
+    .wl-modal__confirm{
+        color: $brand-primary;
+    }
+    @keyframes anim-open {
+        from { opacity: 0; transform: translate3d(-50%,-50%,0) scale3d( .5,  .5,  .5); }
+        to { opacity: 1; transform: translate3d(-50%,-50%,0) scale3d(1, 1, 1); }
+    }
+/* 其他 */
+	.m-empty-tip{
+		font-size: 28px; line-height:42px; color: $color-text-secondary; text-align: center;
+	}

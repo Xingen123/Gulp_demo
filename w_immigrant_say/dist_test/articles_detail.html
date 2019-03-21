@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/swiper.min.css">
+<style>
+
+</style>
+</head>
+
+<body>
+    <div id="app" v-cloak class="xeBG">
+        <!-- 头 -->
+        <div class="q_header">
+            <div class="q_title">{{name}}</div>
+            <div class="q_click" @click="shaixuan">筛选<i></i></div>
+        </div>
+        <div class="swiper_box">
+            <div class="swiper-container gallery-thumbs" v-if="tabBartags">
+                <div class="swiper-wrapper" v-if="paternId">
+                    <div class="swiper-slide title_tab" v-for="(title,index) in tabFsritTitle">{{title.name}}</div>
+                </div>
+                <div class="swiper-wrapper" v-else>
+                    <div class="swiper-slide title_tab" v-for="(title,index) in tabFsritTitle">{{title.name}}</div>
+                </div>
+            </div>
+            <div class="swiper-container gallery-top">
+                <div class="xe_loading_box" v-show="loading">
+                    <div class="xe_loading_icon"></div>
+                    <div class="xe_loading_text">loading...</div>
+                </div>
+                <div class="swiper-wrapper">
+                    <!-- 内容 -->
+
+                    <div class="q_tab-content swiper-slide" v-for="(item,index) in tabFsritTitle.length" :key="index">
+                        <div v-for="m in tabMain" class="q_box" @click="listGo(m.article_id)">
+                            <img :src="m.cover" alt="" class="q_boximg">
+                            <div class="q_content">
+                                <div class="q_content_p">{{m.name}}</div>
+                                <div class="q_time">
+                                    <i></i>
+                                    <span>{{m.created_at}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- tab -->
+        <!-- <ul class="q_tab">
+                <li v-for="(title,index) in tabFsritTitle" @click="cur=index" :class="{q_active:cur==index}">{{title}}</li>
+            </ul> -->
+
+        <!-- 底线 -->
+        <loadmore>{{title_button}}</loadmore>
+        <!-- 筛选 -->
+        <transition name="fade">
+            <div class="q_boxshow" v-show="box" @click="boxHide">
+            </div>
+        </transition>
+        <transition name="bounce">
+            <div class="q_smallbox" v-show="box">
+                <div class="q_input_box">
+                    <i></i>
+                    <input type="text" placeholder="请输入文章标题关键字" v-model="search_text" class="q_input">
+                </div>
+
+                <div class="q_hold">
+                    按项目
+                </div>
+                <ul class="q_ulbox">
+                    <li v-for="(item,idx) in tabTitle" :key="idx" class="q_libox" @click="selectStyle(item,idx)">
+                        <div :class="idx==index?'liactive':''">
+                            {{item.name}}
+                        </div>
+                    </li>
+                </ul>
+                <div class="q_hold">
+                    按地区
+                </div>
+                <ul class="q_ulbox_two">
+                    <li v-for="(item,idx) in tabTwo" :key="idx" class="q_libox_two" @click="select(item, idx)">
+                        <div :class="idx==indexTwo?'liactive':''">
+                            {{item.name}}
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="q_button">
+                    <div class="q_button_no" @click="box=!box">取消</div>
+                    <div class="q_button_yes" @click="yesSearch">确认</div>
+                </div>
+            </div>
+        </transition>
+        <!-- 加载更多 -->
+
+        <div class="loading" v-show="showlaoding">
+            加载更多
+        </div>
+
+    </div>
+    <script src="js/swiper.min.js"></script>
+    <script src="js/vconsole.min.js"></script>
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.min.js"></script>
+
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    page: 1, //页码
+                    tabMain: [], // 数据
+                    box: false, //弹出框
+                    index: -1,
+                    indexTwo: -1,
+                    title: true,
+                    name: "",
+                    type_id: "",
+                    area_id: "",
+                    tabTwo: [],
+                    tabFsritTitle: ["项目介绍", "热点资讯"],
+                    search_text: "",
+                    title_button: "我也是有底线的",
+                    activeIndex: "",
+                    showlaoding: false, // 滚动loading
+                    loading: false, //切换loading
+                    paternId: "",
+                    tabTitle: [], //子页面标签名字
+                    tabBartags: true, // 子页面标签是否显示
+                    ScrollChildId: "" // 子页面标签id
+                }
+            },
+
+            mounted() {
+                this.nameHerf()
+                let self = this
+                let tabBar = new Swiper('.gallery-thumbs', {
+                    observer: true,
+                    spaceBetween: 10, //slide之间的距离（单位px）。
+                    slidesPerView: 3, //设置slider容器能够同时显示的slides数量
+                    freeMode: true, //滑动的方式 一格 false
+                    watchSlidesVisibility: true, //会在每个可见slide增加一个class
+                    watchSlidesProgress: true,
+                });
+                let bannerContent = new Swiper('.gallery-top', {
+                    observer: true,
+                    on: {
+                        slideChangeTransitionStart: function() {},
+                        slideChangeTransitionEnd: function() {
+
+                            let typeId = self.tabFsritTitle[this.activeIndex].type_id ? self.tabFsritTitle[this.activeIndex].type_id : self.tabFsritTitle[this.activeIndex].tag_id;
+                            let state = self.tabFsritTitle[this.activeIndex].type_id ? 0 : 1;
+                            self.tabSearch(typeId, state)
+                        },
+                    },
+                    spaceBetween: 10,
+                    thumbs: {
+                        swiper: tabBar
+                    }
+                });
+                // 注册scroll事件并监听
+                // window.addEventListener('scroll', () => {
+                //     // console.info('可视区域大小' + document.documentElement.clientHeight + '........' + window.innerHeight)
+                //     //console.info('滚动高度' + document.body.scrollTop) //原生的方法存在的兼容性问题 mac上面就计算出来是0
+                //     var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+
+                //     console.info('文档高度' + document.body.offsetHeight)
+                //     console.info('paternId:' + this.paternId,"标签id：" + this.ScrollChildId)
+                //     //判断是否滚动到底部
+                //     if (scrollTop + window.innerHeight + 0>= document.body.offsetHeight) { //0 表示距离底部多少的距离的开始触发loadmore效果
+                //         if (!this.showlaoding) { //防止多次加载
+                //             console.log('触发loadmore效果')
+                //             this.getData(this.page += 1)
+                //         }
+
+                //     }
+                // })
+
+            },
+            methods: {
+                //shaixuan
+                shaixuan() {
+                    this.box = true;
+                },
+                //滚动加载更多
+                getData(page) {
+                    this.showlaoding = true
+                    service.post(api.articles_search, {
+                            token: api.api_token,
+                            tag_id: this.tag_id,
+                            area_id: this.area_id,
+                            child_type_id: this.ScrollChildId,
+                            parent_id: this.paternId,
+                            article_name: this.search_text,
+                            perPage: 10,
+                            page: page
+                        })
+                        .then((res) => {
+                            console.log(res, 7777)
+                            if (res.message == "ok") {
+                                let list = res.data.articles.data
+                                if (list.length === 0) {
+                                    this.showlaoding = false
+                                } else {
+                                    this.tabMain = [...this.tabMain, ...this.list]
+                                }
+                            }
+                        }).catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+
+                //弹出框
+                boxHide(event) {
+                    let el1 = event.currentTarget;
+                    let el2 = event.target;
+                    if (el1 == el2) {
+                        this.box = !this.box;
+                    }
+                },
+
+                //项目关键字点击
+                selectStyle(item, idx) {
+                    //child_type_id: ""
+                    if (this.index == idx) {
+                        this.index = -1;
+                        this.type_id = '';
+                    } else {
+                        this.index = idx
+                        this.type_id = item.type_id ? item.type_id : item.tag_id;
+                        console.log(item)
+                    }
+
+                },
+                //地区关键字点击
+                select(item, idx) {
+                    //area_id
+                    if (this.indexTwo == idx) {
+                        this.indexTwo = -1;
+
+                        this.area_id = '';
+                    } else {
+                        this.indexTwo = idx;
+                        this.area_id = item.area_id;
+                        console.log(item)
+                    }
+                },
+                //点击跳转咨询详情
+                listGo(articleId) {
+                    location.href = 'articles_content.html?id=' + articleId
+                },
+                //点击子标签查询
+                tabSearch(typeId, num) {
+                    // this.ScrollChildId = typeId;
+                    // console.log(typeId,num,"TAGid")
+                    if (num == 0) {
+                        service.post(api.articles_search, {
+                                child_type_id: typeId,
+                                perPage: 10,
+                                page: 1
+                            })
+                            .then((res) => {
+                                let tabContent = res.data.articles.data;
+                                this.tabMain = tabContent;
+                                if (tabContent.length === 0) {
+                                    this.title_button = "暂没有想要的数据";
+                                } else {
+                                    this.title_button = "我也是有底线的";
+                                }
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+                        return;
+                    } else {
+                        service.post(api.articles_search, {
+                                tag_id: typeId,
+                                area_id: this.area_id,
+                                perPage: 10,
+                                page: 1
+                            })
+                            .then((res) => {
+                                let tabContent = res.data.articles.data;
+                                this.tabMain = tabContent;
+                                if (tabContent.length === 0) {
+                                    this.title_button = "暂没有想要的数据";
+                                } else {
+                                    this.title_button = "我也是有底线的";
+                                }
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+                    }
+
+                },
+                //点击查询
+                yesSearch() {
+                    service.post(api.articles_search, {
+                            child_type_id: this.type_id,
+                            area_id: this.area_id,
+                            article_name: this.search_text,
+                            perPage: 10,
+                            page: this.page
+                        })
+                        .then((sea) => {
+                            this.box = false;
+                            this.name = "";
+                            console.log(sea.data.articles.data, 9999)
+                            this.tabBartags = false;
+                            let atLength = sea.data.articles.data;
+                            this.tabMain = atLength;
+                            if (atLength.length === 0) {
+                                this.title_button = "暂没有想要的数据";
+                            } else {
+                                this.title_button = "我也是有底线的";
+                            }
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+
+                searchTag(pareId) {
+                    service.post(api.articles_chlid)
+                        .then((res) => {
+                            this.tabTitle = res.data.tags;
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+
+                    //国家
+                    service.post(api.articles_areas)
+                        .then((acct) => {
+                            this.tabTwo = acct.data.areas;
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                //首次加载
+                nameHerf() {
+                    let item = JSON.parse(localStorage.getItem('item'));
+                    this.name = item.name; //父页面带过来的名字
+                    let paternId = item.type_id ? item.type_id : ""; //父页面判的type_id
+                    this.searchTag(paternId)
+
+                    //搜索
+                    if (item.article_name) {
+                        this.tabBartags = false;
+                        service.post(api.articles_search, {
+                                article_name: item.article_name,
+                                page: 1,
+                                perPage: 10
+                            })
+                            .then((res) => {
+                                let articles = res.data.articles.data;
+                                if (articles.length == 0) {
+                                    this.$toast("暂没有想要的数据");
+                                    return;
+                                } else {
+                                    this.tabMain = articles;
+                                }
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+                        return;
+                    }
+                    console.log(999)
+
+                    //筛选关键字
+
+
+                    if (paternId) { //咨询分类
+
+                        //标签tab
+                        this.paternId = paternId;
+
+                        service.post(api.articles_chlid, {
+                                parent_id: paternId
+                            })
+                            .then((res) => {
+                                this.tabFsritTitle = res.data.tags;
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+
+
+                        service.post(api.articles_search, {
+                                parent_type_id: paternId
+                            })
+                            .then((res) => {
+                                let articles = res.data.articles.data;
+                                if (articles.length == 0) {
+                                    this.title_button = "暂没有想要的数据";
+                                }
+                                this.tabMain = res.data.articles.data;
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+
+                    } else { //国家
+                        console.log("05")
+                        service.post(api.articles_tags)
+                            .then((res) => {
+                                this.tabFsritTitle = res.data.tags;
+                                return res.data.tags;;
+                            }).then((tagsId) => {
+                                //页面数据
+                                this.area_id = item.area_id;
+                                service.post(api.articles_search, {
+                                        area_id: item.area_id,
+                                        tag_id: tagsId[0].tag_id
+                                    })
+                                    .then((res) => {
+                                        let articles = res.data.articles.data;
+                                        this.tabMain = articles
+                                        if (articles.length == 0) {
+                                            this.title_button = "暂没有想要的数据";
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        this.$toast(error)
+                                    });
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+
+                    }
+                },
+            }
+        })
+    </script>
+
+</body>
+
+</html>

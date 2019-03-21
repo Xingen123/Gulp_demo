@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>外联出国</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="stylesheet" href="./css/common.css">
+
+<body>
+
+    <div id="app" v-cloak>
+        <div class="m-card">
+            <div class="m-card__hd">
+                <div class="m-card__title">
+                    全部产品
+                </div>
+                <div class="m-card__extra" @click="openDrawer">
+                    筛选<i class="ui-icon ui-icon-filter m-card__icon"></i>
+                </div>
+            </div>
+            <div class="m-card__bd">
+                <a class="m-product" v-for="(item, index) in product_list" :href="item.jump_url">
+                    <div class="m-product__hd">
+                        <img class="m-product__cover" :src="item.cover">
+                        <div class="m-product__intro">
+                            <h3 class="m-product__title">{{item.name}}</h3>
+                            <p class="m-product__desc">先获批后投资，全家4代移民</p>
+                        </div>
+                    </div>
+                    <div class="m-product__bd">
+                        <div class="m-requirement">
+                            <div class="m-requirement__col">
+                                <div class="m-requirement__desc">{{item.age_demand}}</div>
+                                <div class="m-requirement__title">年龄要求</div>
+                            </div>
+                            <div class="m-requirement__col">
+                                <div class="m-requirement__desc">{{item.live_demand}}</div>
+                                <div class="m-requirement__title">居住要求</div>
+                            </div>
+                            <div class="m-requirement__col">
+                                <div class="m-requirement__desc">{{item.investment_quota}}</div>
+                                <div class="m-requirement__title">投资额度</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <loadmore></loadmore>
+
+        <transition name="fade">
+            <div class="wl-mask" v-if="show" @click="closeDrawer"></div>
+        </transition>
+        <transition name="drawer">
+            <div class="m-drawer" v-if="show">
+                <div class="drawer-filter drawer-filter_country">
+                    <div class="drawer-filter__hd">按国家</div>
+                    <div class="drawer-filter__bd">
+                        <div class="drawer-filter__group">
+                            <a class="drawer-filter__country" :class="{'is-active':checkedCountry===item.name}" v-for="(item, index) in product_country"
+                                @click="chooseCountry(item.name)">
+                                <img class="drawer-filter__flag" :src="item.flag_src">{{item.name}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="drawer-filter">
+                    <div class="drawer-filter__hd">按项目</div>
+                    <div class="drawer-filter__bd">
+                        <div class="drawer-filter__group">
+                            <a class="drawer-filter__tag" :class="{'is-active':checkedProject===item.name}" v-for="(item, index) in product_types"
+                                @click="chooseProject(item.name)">{{item.name}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="drawer-footer">
+                    <button class="ui-btn ui-btn_default drawer-footer__btn" @click="closeDrawer">取消</button>
+                    <button class="ui-btn ui-btn_primary drawer-footer__btn" @click="submitfilter">确定</button>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+        <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- <script src="./js/jweixin-1.4.0.min.js"></script> -->
+    <script src="./js/common.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    show: false,
+                    checkedCountry: null,
+                    checkedProject: null,
+                    product_list: [],
+                    product_country: [],
+                    product_types: [],
+                    loadingMore: false,
+                    current_page: 1
+                }
+            },
+            mounted() {
+                this.postProductList()
+                this.postFilterData()
+
+                window.addEventListener('scroll', () => {
+                    let scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+                    if (scrollTop + window.innerHeight >= document.body.offsetHeight - 50) {
+                        if (!this.loadingMore) {
+                            this.postProductList(this.current_page += 1)
+                        }
+                    }
+                });
+            },
+            methods: {
+                // 产品：城市列表
+                postProductList(page, filterField) {
+                    this.loadingMore = true
+                    if (filterField) {
+                        service.post(api.product_list, filterField)
+                            .then((res) => {
+                                this.product_list = res.data.data
+                                this.closeDrawer()
+                            })
+                            .catch((error) => {
+                                this.$toast(error)
+                            });
+                        return false;
+                    }
+                    service.post(api.product_list,{
+                        page
+                    })
+                        .then((res) => {
+                            if (page > res.data.last_page) {
+                                return false;
+                            } else {
+                                this.product_list = [...this.product_list, ...res.data.data]
+                                this.loadingMore = false
+                            }
+                        })
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 产品：获取筛选数据
+                postFilterData() {
+                    service.all([service.post(api.product_country), service.post(api.product_types)])
+                        .then(service.spread((country, types) => {
+                            this.product_country = country.data
+                            this.product_types = types.data
+                        }))
+                        .catch((error) => {
+                            this.$toast(error)
+                        });
+                },
+                // 选择项目
+                chooseProject(name) {
+                    if (this.checkedProject === name) {
+                        this.checkedProject = null
+                    } else {
+                        this.checkedProject = name
+                    }
+                },
+                // 选择项目
+                chooseCountry(name) {
+                    if (this.checkedCountry === name) {
+                        this.checkedCountry = null
+                    } else {
+                        this.checkedCountry = name
+                    }
+                },
+                // 关闭抽屉
+                closeDrawer() {
+                    this.show = false
+                },
+                // 打开抽屉
+                openDrawer() {
+                    this.show = !this.show
+                },
+                // 提交筛选
+                submitfilter() {
+                    if (this.checkedCountry == null && this.checkedProject == null) {
+                        this.postProductList()
+                        this.closeDrawer()
+                    } else {
+                        let filterField = {
+                            country: this.checkedCountry,
+                            project_type: this.checkedProject
+                        }
+                        this.postProductList(1, filterField)
+                    }
+                }
+            }
+        })
+
+        // 禁止回退上一页
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", function (e) {
+            WeixinJSBridge.invoke('closeWindow', {}, function (res) {
+                //alert(res.err_msg);
+            });
+        }, false);
+    </script>
+
+</body>
+
+</html>
